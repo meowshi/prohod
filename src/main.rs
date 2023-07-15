@@ -51,7 +51,7 @@ struct Args {
     #[arg(short, long)]
     weekend: Option<bool>,
 
-    #[arg(short, long, default_value = "false")]
+    #[arg(long, default_value = "false")]
     total: bool,
 }
 
