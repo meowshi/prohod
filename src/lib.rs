@@ -14,7 +14,6 @@ pub enum Day {
     Weekend,
 }
 
-#[derive(Debug)]
 pub struct You {
     date: String,
     from: NaiveTime,
@@ -25,6 +24,7 @@ pub struct You {
     day: Day,
     total: bool,
     client: reqwest::Client,
+    printer: Box<dyn Printer>,
 }
 
 impl You {
@@ -39,6 +39,12 @@ impl You {
         total: bool,
     ) -> Self {
         let client = reqwest::Client::new();
+        let printer: Box<dyn Printer> = if total {
+            Box::new(TotalPrinter)
+        } else {
+            Box::new(JustPrinter)
+        };
+
         You {
             date: date.to_owned(),
             cookie: cookie.to_owned(),
@@ -49,37 +55,12 @@ impl You {
             day,
             client,
             total,
+            printer,
         }
     }
 
     pub async fn print_sessions(&self) {
-        let sessions = self.get_sessions().await;
-
-        let mut sessions_info = vec![];
-
-        let mut total = SessionInfo::default();
-
-        let mut time = self.from;
-
-        while time <= self.to {
-            let mut info = self.get_session_info(sessions.get(&time).unwrap()).await;
-            info.time = time.format("%H:%M").to_string();
-
-            if self.total {
-                total += &info;
-            }
-
-            sessions_info.push(info);
-
-            time += Duration::minutes(30);
-        }
-
-        if self.total {
-            total.time = "Итого".to_owned();
-            sessions_info.push(total);
-        }
-
-        print_stdout(sessions_info.with_title()).unwrap();
+        self.printer.as_ref().print(self).await;
     }
 
     pub fn identifier(&self) -> String {
@@ -218,5 +199,63 @@ impl<'a> AddAssign<&'a Self> for SessionInfo {
         self.left += rhs.left;
         self.passed += rhs.passed;
         self.sold += rhs.sold;
+    }
+}
+
+#[async_trait]
+trait Printer: Sync + Send {
+    async fn print(&self, you: &You);
+}
+
+struct TotalPrinter;
+#[async_trait]
+impl Printer for TotalPrinter {
+    async fn print(&self, you: &You) {
+        let sessions = you.get_sessions().await;
+
+        let mut sessions_info = vec![];
+
+        let mut total = SessionInfo::default();
+
+        let mut time = you.from;
+
+        while time <= you.to {
+            let mut info = you.get_session_info(sessions.get(&time).unwrap()).await;
+            info.time = time.format("%H:%M").to_string();
+
+            total += &info;
+
+            sessions_info.push(info);
+
+            time += Duration::minutes(30);
+        }
+
+        total.time = "Итого".to_owned();
+        sessions_info.push(total);
+
+        print_stdout(sessions_info.with_title()).unwrap();
+    }
+}
+
+struct JustPrinter;
+#[async_trait]
+impl Printer for JustPrinter {
+    async fn print(&self, you: &You) {
+        let sessions = you.get_sessions().await;
+
+        let mut sessions_info = vec![];
+
+        let mut time = you.from;
+
+        while time <= you.to {
+            let mut info = you.get_session_info(sessions.get(&time).unwrap()).await;
+            info.time = time.format("%H:%M").to_string();
+
+            sessions_info.push(info);
+
+            time += Duration::minutes(30);
+        }
+
+        print_stdout(sessions_info.with_title()).unwrap();
     }
 }
