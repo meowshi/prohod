@@ -246,8 +246,6 @@ impl Printer for JustPrinter {
         let mut sessions_info = vec![];
 
         let mut time = you.from;
-        println!("{time}");
-        println!("{:?}", sessions);
 
         while time <= you.to {
             let mut info = you.get_session_info(sessions.get(&time).unwrap()).await;
