@@ -102,7 +102,7 @@ impl You {
         let mut sessions = HashMap::new();
         let mut time = match self.day {
             Day::Weekday => NaiveTime::from_hms_opt(12, 0, 0).unwrap(),
-            Day::Weekend => NaiveTime::from_hms_opt(12, 0, 0).unwrap(),
+            Day::Weekend => NaiveTime::from_hms_opt(11, 0, 0).unwrap(),
         };
         let mut i = 33;
         while let Some(href) = hrefs.get(i) {
@@ -218,8 +218,6 @@ impl Printer for TotalPrinter {
         let mut total = SessionInfo::default();
 
         let mut time = you.from;
-        println!("{time}");
-        println!("{:?}", sessions);
 
         while time <= you.to {
             let mut info = you.get_session_info(sessions.get(&time).unwrap()).await;
@@ -248,6 +246,8 @@ impl Printer for JustPrinter {
         let mut sessions_info = vec![];
 
         let mut time = you.from;
+        println!("{time}");
+        println!("{:?}", sessions);
 
         while time <= you.to {
             let mut info = you.get_session_info(sessions.get(&time).unwrap()).await;
