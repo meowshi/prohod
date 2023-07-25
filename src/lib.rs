@@ -63,14 +63,14 @@ struct Args {
 
 impl Args {
     fn polish(&mut self) {
-        let today = Local::now().date_naive();
-
         if self.date.is_none() {
             self.date = Some(Local::now().date_naive().format("%d.%m.%Y").to_string());
         }
 
+        let day = NaiveDate::parse_from_str(&self.date.clone().unwrap(), "%d.%m.%Y").unwrap();
+
         if self.from.is_none() {
-            self.from = match today.weekday() {
+            self.from = match day.weekday() {
                 Weekday::Sat | Weekday::Sun => NaiveTime::from_hms_opt(11, 0, 0),
                 _ => NaiveTime::from_hms_opt(12, 0, 0),
             };

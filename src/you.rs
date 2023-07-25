@@ -94,10 +94,8 @@ impl You {
         let hrefs: Vec<_> = dom.query_selector("a[href]").unwrap().collect();
 
         let mut sessions = HashMap::new();
-        let mut time = match self.day {
-            Day::Weekday => NaiveTime::from_hms_opt(12, 0, 0).unwrap(),
-            Day::Weekend => NaiveTime::from_hms_opt(11, 0, 0).unwrap(),
-        };
+
+        let mut time = self.from;
         let mut i = 33;
         while let Some(href) = hrefs.get(i) {
             let href = href.get(parser).unwrap().outer_html(parser);

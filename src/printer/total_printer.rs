@@ -32,6 +32,10 @@ impl Printer for TotalPrinter {
         total.time = "Итого".to_owned();
         sessions_info.push(total);
 
+        println!(
+            "\n          ЦИФРЫ НА {}",
+            chrono::Local::now().format("%H:%M:%S")
+        );
         print_stdout(sessions_info.with_title()).unwrap();
     }
 }
