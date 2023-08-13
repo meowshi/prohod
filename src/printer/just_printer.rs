@@ -12,9 +12,6 @@ impl Printer for JustPrinter {
     async fn print(&self, you: &You) {
         let sessions = you.get_sessions().await;
 
-        let mut times = sessions.keys().collect::<Vec<_>>();
-        times.sort();
-
         let mut sessions_info = vec![];
 
         let mut time = you.from;
