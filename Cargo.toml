@@ -1,0 +1,20 @@
+[package]
+name = "prohod"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1.71"
+base16ct = {version = "0.2.0", features = ["alloc"] }
+chrono = "0.4.26"
+clap = { version = "4.3.8", features = ["derive"] }
+cli-table = "0.4.7"
+clipboard = "0.5.0"
+dotenv = "0.15.0"
+md-5 = "0.10.5"
+reqwest = "0.11.18"
+sha1 = "0.10.5"
+tl = { version = "0.7.7" }
+tokio = { version = "1.28.2", features = ["full"] }
